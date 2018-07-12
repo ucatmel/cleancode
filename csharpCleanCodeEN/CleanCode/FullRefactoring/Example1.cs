@@ -9,60 +9,75 @@ namespace Project.UserControls
 {
     public class PostControl : System.Web.UI.UserControl
     {
-        private PostDbContext DBContext;
 
+        private readonly PostDbContext _dbContext;
+        private Post GetPost(int postId)
+        {
+            return _dbContext.Posts.SingleOrDefault(p => p.Id == postId);
+        }
+        private void SavePost(Post post)
+        {
+            _dbContext.Posts.Add(post);
+            _dbContext.SaveChanges();
+        }
+
+        public PostControl()
+        {
+            _dbContext = new PostDbContext();
+        }
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            DBContext = new PostDbContext();
 
             if (Page.IsPostBack)
+                TrySavePost();
+            else
+                DisplayPost();
+        }
+
+        private void DisplayPost()
+        {
+            int postId = Convert.ToInt32(Request.QueryString["id"]);
+            Post entity = GetPost(postId);
+            PostBody.Text = entity.Body;
+            PostTitle.Text = entity.Title;
+        }
+
+        private void TrySavePost()
+        {
+            PostValidator validator = new PostValidator();
+            Post entity = new Post()
             {
-                PostValidator validator = new PostValidator();
-                Post entity = new Post()
-                {
-                    // Map form fields to entity properties
-                    Id = Convert.ToInt32(PostId.Value),
-                    Title = PostTitle.Text.Trim(),
-                    Body = PostBody.Text.Trim()
-                };
-                ValidationResult results = validator.Validate(entity);
+                // Map form fields to entity properties
+                Id = Convert.ToInt32(PostId.Value),
+                Title = PostTitle.Text.Trim(),
+                Body = PostBody.Text.Trim()
+            };
+            ValidationResult results = validator.Validate(entity);
 
-                if (results.IsValid)
-                {
-                    // Save to the database and continue to the next page
-                    DBContext.Posts.Add(entity);
-                    DBContext.SaveChanges();
-                }
-                else
-                {
-                    BulletedList summary = (BulletedList)FindControl("ErrorSummary");
+            if (results.IsValid)
+                SavePost(entity);
+            else
+            {
+                BulletedList summary = (BulletedList)FindControl("ErrorSummary");
 
-                    // Display errors to the user
-                    foreach (var failure in results.Errors)
+                // Display errors to the user
+                foreach (var failure in results.Errors)
+                {
+                    Label errorMessage = FindControl(failure.PropertyName + "Error") as Label;
+
+                    if (errorMessage == null)
                     {
-                        Label errorMessage = FindControl(failure.PropertyName + "Error") as Label;
-
-                        if (errorMessage == null)
-                        {
-                            summary.Items.Add(new ListItem(failure.ErrorMessage));
-                        }
-                        else
-                        {
-                            errorMessage.Text = failure.ErrorMessage;
-                        }
+                        summary.Items.Add(new ListItem(failure.ErrorMessage));
+                    }
+                    else
+                    {
+                        errorMessage.Text = failure.ErrorMessage;
                     }
                 }
             }
-            else
-            {
-                // Display form
-                Post entity = DBContext.Posts.SingleOrDefault(p => p.Id == Convert.ToInt32(Request.QueryString["id"]));
-                PostBody.Text = entity.Body;
-                PostTitle.Text = entity.Title;
-
-            }
         }
+
 
         public Label PostBody { get; set; }
 
