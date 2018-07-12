@@ -3,9 +3,11 @@ namespace CleanCode.MagicNumbers
 {
     public class MagicNumbers
     {
+        private const int draft = 1;
+
         public void ApproveDocument(int status)
         {
-            if (status == 1)
+            if (status == draft)
             {
                 // ...
             }

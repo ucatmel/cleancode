@@ -23,4 +23,3 @@ namespace CleanCode.FullRefactoring
         }
     }
 }
-
