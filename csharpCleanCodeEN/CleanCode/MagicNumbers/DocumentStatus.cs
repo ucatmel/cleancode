@@ -1,8 +1,10 @@
-﻿namespace CleanCode.MagicNumbers
+﻿
+
+namespace CleanCode.MagicNumbers
 {
     public enum DocumentStatus
     {
-        Draft = 1,
-        Lodged = 2
+         Draft = 1,
+         Lodged = 2
     }
 }
