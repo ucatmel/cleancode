@@ -16,6 +16,7 @@ namespace cleanCodeSolid
             IRestResponse response = client.Execute(request);
             Console.WriteLine("Hello World!");
             Console.WriteLine(response.Content);
+            
             Console.ReadKey();
 
         }
