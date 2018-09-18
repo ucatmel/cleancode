@@ -28,6 +28,7 @@ namespace cleanCodeSolid
 
             Console.WriteLine($"Das Wetter in {stadt} ist {rootweather.weather[0].description}" );
             Console.WriteLine(response.Content);
+            
             Console.ReadKey();
 
         }
